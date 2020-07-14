@@ -1,5 +1,6 @@
 from sanic import Sanic, response
 from playhouse.shortcuts import model_to_dict
+import sanic  # For things we want to access via the sanic namespace (for clarity)
 import models
 from rdflib import Graph, RDF
 from rdflib.namespace import FOAF
@@ -13,7 +14,12 @@ app = Sanic('Test API')
 async def r_store(req):
 	uri = req.json['uri']
 	web_id = models.WebID(uri=uri)
-	web_id.save()
+
+	try:
+		web_id.save()
+	except sanic.exceptions.IntegrityError:  # Thrown when you try to add an existing unique value
+		return response.text('WebID already exists in database')
+
 	return response.text('WebID succesfully added to the database!')
 
 
