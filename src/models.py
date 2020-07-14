@@ -9,7 +9,8 @@ db = PostgresqlDatabase(
 	host=secret.PG_HOST,
 	database=secret.PG_DBNAME,
 	user=secret.PG_USER,
-	password=secret.PG_PASS
+	password=secret.PG_PASS,
+	autorollback=True
 )
 
 # NOTE: peewee unfortunately does not support automatic schema migrations, so we have to handle this manually if we change a model.
