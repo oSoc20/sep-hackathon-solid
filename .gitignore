@@ -3,3 +3,4 @@ src/secret.py
 .venv/
 .vscode/
 src/__pycache__/
+.idea/
