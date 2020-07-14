@@ -12,8 +12,8 @@ app = Sanic('Test API')
 @app.route('/store/', methods=['POST'])
 async def r_store(req):
 	uri = req.json['uri']
-	wid = models.WebID(uri=uri)
-	wid.save()
+	web_id = models.WebID(uri=uri)
+	web_id.save()
 	return response.text('WebID succesfully added to the database!')
 
 
@@ -28,7 +28,7 @@ async def r_get(req):
 async def r_get(req, name):
 	web_ids = get_web_ids()
 
-	valid_webids = []
+	valid_web_ids = []
 	for web_id in web_ids:
 		uri = web_id['uri']
 		graph = Graph()
@@ -38,10 +38,10 @@ async def r_get(req, name):
 		# get all Persons in the solid pod and loop over them
 		for person in graph.subjects(RDF.type, FOAF.Person):
 			# get all names of these Persons and loop over them
-			for webid_name in graph.objects(person, FOAF.name):
+			for web_id_name in graph.objects(person, FOAF.name):
 				# check if the name on the solid pod equals the given name
-				if check_equal_names(name, str(webid_name)):
-					valid_webids.append(web_id)
+				if check_equal_names(name, str(web_id_name)):
+					valid_web_ids.append(web_id)
 					web_id_added = True
 					break
 
@@ -49,17 +49,18 @@ async def r_get(req, name):
 			if web_id_added:
 				break
 
-	return response.json(valid_webids)
+	return response.json(valid_web_ids)
+
 
 
 def get_web_ids():
-	webids = models.WebID.select()
+	web_ids = models.WebID.select()
 
-	webids = [model_to_dict(wid) for wid in webids]  # Convert list of ModelSelect objects to Python dicts
-	for wid in webids:
-		wid['date_created'] = wid['date_created'].isoformat()  # Convert Python datetime object to ISO 8601 string
+	web_ids = [model_to_dict(web_id) for web_id in web_ids]  # Convert list of ModelSelect objects to Python dicts
+	for web_id in web_ids:
+		web_id['date_created'] = web_id['date_created'].isoformat()  # Convert Python datetime object to ISO 8601 string
 
-	return webids
+	return web_ids
 
 
 
