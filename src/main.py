@@ -4,8 +4,7 @@ from peewee import IntegrityError
 import models
 from rdflib import Graph, RDF
 from rdflib.namespace import FOAF
-import os
-import json
+from os import environ
 
 app = Sanic('Test API')
 
@@ -78,4 +77,4 @@ def check_equal_names(name1, name2):
 
 if __name__ == '__main__':
 	models.db.create_tables([models.WebID])  # Connect to database & create tables if necessary
-	app.run(host='0.0.0.0', port=8000, debug=os.environ.get('DEBUG'))
+	app.run(host='0.0.0.0', port=8000, debug=environ.get('DEBUG'))

@@ -1,15 +1,16 @@
 from peewee import Model, PostgresqlDatabase, CharField, DateTimeField
 import datetime
 
-import secret
+from os import environ
+
 
 # TODO: peewee's docs mention a middleware thing for sanic, but it seems to want to reconnect to the database for every request? Maybe check it out
 # http://docs.peewee-orm.com/en/latest/peewee/database.html#sanic
 db = PostgresqlDatabase(
-	host=secret.PG_HOST,
-	database=secret.PG_DBNAME,
-	user=secret.PG_USER,
-	password=secret.PG_PASS,
+	host=environ.get('PG_HOST'),
+	database=environ.get('PG_DBNAME'),
+	user=environ.get('PG_USER'),
+	password=environ.get('PG_PASS'),
 	autorollback=True
 )
 

@@ -1,6 +1,10 @@
-src/secret.py
+# Docker environment variables
+.env
 
-.venv/
+# Text editor workspaces
 .vscode/
-src/__pycache__/
 .idea/
+
+# Python stuff, probably not really necessary anymore
+.venv/
+src/__pycache__/

@@ -1,0 +1,4 @@
+sanic
+peewee
+psycopg2-binary
+rdflib
