@@ -1,10 +1,15 @@
 FROM python:3
 
-WORKDIR /usr/src/app
+RUN pip install --upgrade pip
 
-COPY requirements.txt ./
-RUN pip install -r requirements.txt
+RUN useradd -ms /bin/bash worker
+USER worker
+WORKDIR /home/worker
 
-COPY src/ ./
+COPY --chown=worker:worker requirements.txt .
+RUN pip install --user -r requirements.txt
+
+
+COPY --chown=worker:worker src/ .
 
 CMD ["python", "main.py"]
