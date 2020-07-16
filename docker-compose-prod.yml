@@ -3,6 +3,7 @@ version: '3.1'
 services:
 
   api:
+    build: .
     image: solidelections/api
     restart: always
     ports:
@@ -21,3 +22,5 @@ services:
       - 5432
     environment:
       - POSTGRES_PASSWORD=${PG_PASS}
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
