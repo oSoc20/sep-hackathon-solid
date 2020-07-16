@@ -2,12 +2,23 @@ version: '3.1'
 
 services:
 
+  proxy:
+    image: caddy:2-alpine
+    restart: always
+    ports:
+      - 443:443
+      - 80:80
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile
+      # - ./proxy/secrets/caddy_lets_encrypt_storage:/data
+      # - ./proxy/secrets/caddy_config_storage:/config
+
   api:
     build: .
     image: solidelections/api
     restart: always
-    ports:
-      - 80:8000
+    expose:
+      - 8000
     environment:
       - DEBUG=${DEBUG}
       - PG_HOST=${PG_HOST}
