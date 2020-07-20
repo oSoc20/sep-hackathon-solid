@@ -15,8 +15,8 @@ To run this project as a development server, you will need [docker-compose](http
 
 
 ## Setup (production)
-To deploy this to a Docker Swarm instance, first copy the `docker-compose-prod.yml` file from this repository to your instance. Then create a `pgdata` folder and a `proxy` folder with a Caddyfile inside of it (copy this from the repo)  
-Now set the abovementioned environment variables, plus a `API_HOST` variable for the domain or IP the Caddy server will be listening on.
+To deploy this to a Docker Swarm instance, first copy the `docker-compose-prod.yml` file from this repository to your instance. Then create a `pgdata` folder for persistent database storage.  
+Now set the environment variables in an `.env` file as described above.
 
 ```bash
 # To deploy the stack
