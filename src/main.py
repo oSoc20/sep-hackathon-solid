@@ -1,4 +1,5 @@
 from sanic import Sanic, response
+from sanic_openapi import swagger_blueprint
 from playhouse.shortcuts import model_to_dict
 from peewee import IntegrityError
 import models
@@ -7,6 +8,7 @@ from rdflib.namespace import FOAF
 from os import environ
 
 app = Sanic('Test API')
+app.blueprint(swagger_blueprint)
 
 
 @app.route('/store/', methods=['POST'])
