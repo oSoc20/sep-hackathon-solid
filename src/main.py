@@ -9,6 +9,8 @@ from os import environ
 
 app = Sanic('Test API')
 app.blueprint(swagger_blueprint)
+app.config["API_TITLE"] = "Solid Elections API"
+app.config["API_DESCRIPTION"] = "API documentation of the Solid Elections API"
 
 
 @app.route('/store/', methods=['POST'])
