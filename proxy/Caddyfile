@@ -1,5 +1,0 @@
-{$API_HOST} {
-	reverse_proxy {
-		to api:8000
-	}
-}
