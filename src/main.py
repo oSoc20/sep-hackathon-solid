@@ -1,5 +1,5 @@
 from sanic import Sanic, response
-from sanic_openapi import swagger_blueprint
+from sanic_openapi import doc, swagger_blueprint
 from playhouse.shortcuts import model_to_dict
 from peewee import IntegrityError
 import models
@@ -14,6 +14,7 @@ app.config["API_DESCRIPTION"] = "API documentation of the Solid Elections API"
 
 
 @app.route('/store/', methods=['POST'])
+@doc.summary("store a new web id")
 async def r_store(req):
     uri = req.json['uri']
     web_id = models.WebID(uri=uri)
@@ -27,11 +28,15 @@ async def r_store(req):
 
 
 @app.route('/get')
+@doc.summary("get all the web id's")
+@doc.description("This endpoints can be used to retrieve all the web id's that are stored in the database")
 async def r_get(req):
     return response.json(get_web_ids())
 
 
 @app.route('/get/<name>')
+@doc.summary("get web id filtered by name")
+@doc.description("This endpoint can be used to filter the web id's based on their name.")
 async def r_get(req, name):
     web_ids = get_web_ids()
 
