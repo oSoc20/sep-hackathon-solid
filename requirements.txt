@@ -1,4 +1,5 @@
 sanic
+sanic-openapi==0.6.0
 peewee
 psycopg2-binary
 rdflib
