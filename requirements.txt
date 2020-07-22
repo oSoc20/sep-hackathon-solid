@@ -1,5 +1,6 @@
 sanic
 sanic-openapi==0.6.0
+sanic-cors
 peewee
 psycopg2-binary
 rdflib

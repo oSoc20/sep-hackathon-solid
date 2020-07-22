@@ -1,5 +1,6 @@
 from sanic import Sanic, response
 from sanic_openapi import doc, swagger_blueprint
+from sanic_cors import CORS
 from playhouse.shortcuts import model_to_dict
 from peewee import IntegrityError
 import models
@@ -11,6 +12,7 @@ app = Sanic('Test API')
 app.blueprint(swagger_blueprint)
 app.config["API_TITLE"] = "Solid Elections API"
 app.config["API_DESCRIPTION"] = "API documentation of the Solid Elections API"
+CORS(app)
 
 
 @app.route('/store/', methods=['POST'])
