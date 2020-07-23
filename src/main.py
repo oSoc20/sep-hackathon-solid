@@ -140,6 +140,13 @@ async def get_handler(req):
         }
     )
     result_json = query_response.json()['results']['bindings']
+    if len(result_json) == 0:
+        return response.json(
+            {
+                'succes': 'false',
+                'message': 'No person with given name and last name found.'
+            }
+        )
     return response.json(
         {
             'succes': 'true',
