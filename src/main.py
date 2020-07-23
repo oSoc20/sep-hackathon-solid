@@ -10,6 +10,8 @@ from os import environ
 import requests
 import json
 
+import helper_sparql
+
 app = Sanic('Test API')
 app.blueprint(swagger_blueprint)
 app.config["API_TITLE"] = "Solid Elections API"
@@ -19,14 +21,21 @@ CORS(app)
 
 @app.route('/store/', methods=['POST'])
 @doc.summary("store a new web id")
-async def r_store(req):
-    uri = req.json['uri']
-    lblod_id = req.json['lblod_id']
-    web_id = models.WebID(uri=uri, lblod_id=lblod_id)
+async def r_store(req):\
+    # Get 'uri' and 'lblod_id' from JSON body and throw HTTP/400 if one of them is missing
+    uri = req.json.get('uri')
+    lblod_id = req.get('lblod_id')
+    if not uri or not lblod_id:
+        return response.json({'success': False, 'message': 'Please set the "uri" and "lblod_id" fields in your JSON body'}, status=400)
 
+    if not helper_sparql.lblod_id_exists():
+        return response.json({'success': False, 'message': 'This lblod ID does not exist in our dataset'}, status=400)
+
+    # Try to add the data to the database, throw HTTP/400 if user tries to add an existing value
+    web_id = models.WebID(uri=uri, lblod_id=lblod_id)
     try:
         web_id.save()
-    except IntegrityError:  # Thrown when you try to add an existing unique value
+    except IntegrityError:
         return response.json({'success': False, 'message': 'WebID or lblod ID already exists in database'}, status=400)
 
     return response.json({'success': True, 'message': 'WebID succesfully added to the database!'})
