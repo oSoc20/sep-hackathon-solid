@@ -145,7 +145,8 @@ async def get_handler(req):
             {
                 'succes': 'false',
                 'message': 'No person with given name and last name found.'
-            }
+            },
+            status=404
         )
     return response.json(
         {
