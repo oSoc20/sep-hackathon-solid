@@ -102,12 +102,19 @@ async def get_handler(req):
 
 @app.route('/list', methods=['GET'])
 async def get_handler(req):
-    sparql_url = environ.get('SPARQL_URL')
-    if not check_query_args_list(req.query_args):
-        return response.json({'message': 'Wrong query parameters!'}, status=400)
+    try:
+        name = req.args['name'][0]
+        lastname = req.args['lastname'][0]
+    except KeyError:
+        return response.json(
+            {
+                'message': 'Wrong query parameters!',
+                'succes': 'false'
+             },
+            status=400
+        )
 
-    name = req.query_args[0][1]
-    lastname = req.query_args[1][1]
+    sparql_url = environ.get('SPARQL_URL')
 
     query = """
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -132,20 +139,13 @@ async def get_handler(req):
             "query": query
         }
     )
-    json_response = json.loads(
-        query_response.content.decode('utf-8')
+    result_json = query_response.json()['results']['bindings']
+    return response.json(
+        {
+            'succes': 'true',
+            'result': result_json
+        }
     )
-    return response.json(json_response['results']['bindings'])
-
-
-def check_query_args_list(query_args):
-    if not len(query_args) == 2:
-        return False
-    if not query_args[0][0] == 'name':
-        return False
-    if not query_args[1][0] == 'lastname':
-        return False
-    return True
 
 
 def get_web_ids():
