@@ -100,11 +100,17 @@ async def get_handler(req):
     return response.json(json_response['results']['bindings'])
 
 
-@app.route('/list/<name>/<lastname>', methods=['GET'])
-async def get_handler(req, name, lastname):
+@app.route('/list', methods=['GET'])
+async def get_handler(req):
     sparql_url = environ.get('SPARQL_URL')
-    print(type(name))
-    print(type(lastname))
+    print(check_query_args_list(req.query_args))
+    if not check_query_args_list(req.query_args):
+        return response.json({'message': 'Wrong query parameters!'}, status=400)
+
+    print("continuing")
+    name = req.query_args[0][1]
+    lastname = req.query_args[1][1]
+
     query = """
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
@@ -118,7 +124,7 @@ async def get_handler(req, name, lastname):
                 ?list rdf:type mandaat:Kandidatenlijst;
                 mandaat:heeftKandidaat ?person;
                 skos:prefLabel ?listName;
-                mandaat:lijstnummer ?listNumber.    
+                mandaat:lijstnummer ?listNumber.
         }""" % (name, lastname)
     query_response = requests.get(
         sparql_url,
@@ -132,6 +138,16 @@ async def get_handler(req, name, lastname):
         query_response.content.decode('utf-8')
     )
     return response.json(json_response['results']['bindings'])
+
+
+def check_query_args_list(query_args):
+    if not len(query_args) == 2:
+        return False
+    if not query_args[0][0] == 'name':
+        return False
+    if not query_args[1][0] == 'lastname':
+        return False
+    return True
 
 
 def get_web_ids():
