@@ -24,4 +24,5 @@ class BaseModel(Model):
 
 class WebID(BaseModel):
     uri = CharField(unique=True)
+    lblod_id = CharField(unique=True)
     date_created = DateTimeField(default=datetime.datetime.now)

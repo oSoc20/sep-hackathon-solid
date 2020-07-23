@@ -21,12 +21,13 @@ CORS(app)
 @doc.summary("store a new web id")
 async def r_store(req):
     uri = req.json['uri']
-    web_id = models.WebID(uri=uri)
+    lblod_id = req.json['lblod_id']
+    web_id = models.WebID(uri=uri, lblod_id=lblod_id)
 
     try:
         web_id.save()
     except IntegrityError:  # Thrown when you try to add an existing unique value
-        return response.json({'success': False, 'message': 'WebID already exists in database'}, status=400)
+        return response.json({'success': False, 'message': 'WebID or lblod ID already exists in database'}, status=400)
 
     return response.json({'success': True, 'message': 'WebID succesfully added to the database!'})
 
