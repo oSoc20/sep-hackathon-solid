@@ -10,6 +10,6 @@ COPY --chown=worker:worker requirements.txt .
 RUN pip install --user -r requirements.txt
 
 
-COPY --chown=worker:worker src/ .
+COPY --chown=worker:worker src/ app/
 
-CMD ["python", "main.py"]
+CMD ["python", "app/main.py"]
