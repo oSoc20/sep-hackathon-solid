@@ -22,13 +22,13 @@ CORS(app)
 @app.route('/store/', methods=['POST'])
 @doc.summary("store a new web id")
 async def r_store(req):\
-    # Get 'uri' and 'lblod_id' from JSON body and throw HTTP/400 if one of them is missing
+        # Get 'uri' and 'lblod_id' from JSON body and throw HTTP/400 if one of them is missing
     uri = req.json.get('uri')
-    lblod_id = req.get('lblod_id')
+    lblod_id = req.json.get('lblod_id')
     if not uri or not lblod_id:
         return response.json({'success': False, 'message': 'Please set the "uri" and "lblod_id" fields in your JSON body'}, status=400)
 
-    if not helper_sparql.lblod_id_exists():
+    if not helper_sparql.lblod_id_exists(lblod_id):
         return response.json({'success': False, 'message': 'This lblod ID does not exist in our dataset'}, status=400)
 
     # Try to add the data to the database, throw HTTP/400 if user tries to add an existing value
@@ -97,13 +97,13 @@ async def get_handler(req):
             foaf:familyName ?familyName .
     }"""
     query_response = requests.get(
-            sparql_url,
-            params={
-                "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
-                "format": "json",
-                "query": query
-            }
-        )
+        sparql_url,
+        params={
+            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
+            "format": "json",
+            "query": query
+        }
+    )
     json_response = json.loads(
         query_response.content.decode('utf-8')
     )
@@ -113,9 +113,11 @@ async def get_handler(req):
 def get_web_ids():
     web_ids = models.WebID.select()
 
-    web_ids = [model_to_dict(web_id) for web_id in web_ids]  # Convert list of ModelSelect objects to Python dicts
+    # Convert list of ModelSelect objects to Python dicts
+    web_ids = [model_to_dict(web_id) for web_id in web_ids]
     for web_id in web_ids:
-        web_id['date_created'] = web_id['date_created'].isoformat()  # Convert Python datetime object to ISO 8601 string
+        # Convert Python datetime object to ISO 8601 string
+        web_id['date_created'] = web_id['date_created'].isoformat()
 
     return web_ids
 
@@ -126,5 +128,6 @@ def check_equal_names(name1, name2):
 
 
 if __name__ == '__main__':
-    models.db.create_tables([models.WebID])  # Connect to database & create tables if necessary
+    # Connect to database & create tables if necessary
+    models.db.create_tables([models.WebID])
     app.run(host='0.0.0.0', port=8000, debug=environ.get('DEBUG'))
