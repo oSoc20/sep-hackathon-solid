@@ -103,11 +103,9 @@ async def get_handler(req):
 @app.route('/list', methods=['GET'])
 async def get_handler(req):
     sparql_url = environ.get('SPARQL_URL')
-    print(check_query_args_list(req.query_args))
     if not check_query_args_list(req.query_args):
         return response.json({'message': 'Wrong query parameters!'}, status=400)
 
-    print("continuing")
     name = req.query_args[0][1]
     lastname = req.query_args[1][1]
 
