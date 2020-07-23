@@ -100,6 +100,40 @@ async def get_handler(req):
     return response.json(json_response['results']['bindings'])
 
 
+@app.route('/list/<name>/<lastname>', methods=['GET'])
+async def get_handler(req, name, lastname):
+    sparql_url = environ.get('SPARQL_URL')
+    print(type(name))
+    print(type(lastname))
+    query = """
+        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+        PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
+        PREFIX mandaat:<http://data.vlaanderen.be/ns/mandaat#>
+            SELECT DISTINCT ?listName ?listNumber
+            WHERE {
+                ?person persoon:gebruikteVoornaam "%s";
+                foaf:familyName "%s".
+                ?list rdf:type mandaat:Kandidatenlijst;
+                mandaat:heeftKandidaat ?person;
+                skos:prefLabel ?listName;
+                mandaat:lijstnummer ?listNumber.    
+        }""" % (name, lastname)
+    query_response = requests.get(
+        sparql_url,
+        params={
+            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
+            "format": "json",
+            "query": query
+        }
+    )
+    json_response = json.loads(
+        query_response.content.decode('utf-8')
+    )
+    return response.json(json_response['results']['bindings'])
+
+
 def get_web_ids():
     web_ids = models.WebID.select()
 
