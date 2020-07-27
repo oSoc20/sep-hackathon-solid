@@ -123,7 +123,7 @@ async def get_handler(req):
     candidates = helper_sparql.get_lblod_candidates(list_uri)
     for candidate in candidates:
         try:
-            web_id_uri = get_web_id(candidate['identifier']['value'])
+            web_id_uri = get_web_id(candidate['personURI']['value'])
             candidate['webID'] = {
                 'type': 'literal',
                 'value': web_id_uri

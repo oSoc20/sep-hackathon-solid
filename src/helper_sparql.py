@@ -3,13 +3,26 @@ from os import environ
 
 
 def lblod_id_exists(lblod_id):
+    sparql_url = environ.get('SPARQL_URL')
+
     query = """
-    PREFIX ams: <http://www.w3.org/ns/adms#>
-    SELECT DISTINCT ?id
-    WHERE {
-        ?id ams:identifier <%s>.
+    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+    PREFIX ns1: <http://www.w3.org/ns/person#>
+    ASK  {
+    <%s> rdf:type ns1:Person.
     }""" % lblod_id
-    return bool(make_query(query))
+
+    res = requests.get(
+        sparql_url,
+        params={
+            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
+            "format": "json",
+            "query": query
+        }
+    )
+    results = res.json()
+    print(results['boolean'])
+    return bool(results['boolean'])
 
 
 def get_lblod_cities():
@@ -58,15 +71,13 @@ def get_lblod_candidates(list_url):
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-        PREFIX adms: <http://www.w3.org/ns/adms#>
         PREFIX ns1: <http://data.vlaanderen.be/ns/mandaat#>
         PREFIX ns2: <http://data.vlaanderen.be/ns/persoon#>
-        SELECT DISTINCT ?personURI ?name ?familyName ?identifier
+        SELECT DISTINCT ?personURI ?name ?familyName
         WHERE {
             <%s> ns1:heeftKandidaat ?personURI.
             ?personURI ns2:gebruikteVoornaam ?name;
-            foaf:familyName ?familyName;
-            adms:identifier ?identifier.
+            foaf:familyName ?familyName.
         }""" % list_url
 
     return make_query(query)
