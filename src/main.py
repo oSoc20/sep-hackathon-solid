@@ -89,10 +89,10 @@ async def get_handler(req):
     )
 
 
-@app.route('/parties', methods=['GET'])
+@app.route('/lists', methods=['GET'])
 async def get_handler(req):
     try:
-        city_url = req.args['city-url'][0]
+        city_uri = req.args['cityURI'][0]
     except KeyError:
         return response.json(
             {
@@ -100,14 +100,19 @@ async def get_handler(req):
                 'succes': 'false'
             }
         )
-    lists = helper_sparql.get_lblod_lists(city_url)
-    return response.text("Work in progress...")
+    lists = helper_sparql.get_lblod_lists(city_uri)
+    return response.json(
+        {
+            'success': 'true',
+            'result': lists
+        }
+    )
 
 
 @app.route('/candidates', methods=['GET'])
 async def get_handler(req):
     try:
-        list_url = req.args['list-url'][0]
+        list_uri = req.args['listURI'][0]
     except KeyError:
         return response.json(
             {
@@ -115,8 +120,13 @@ async def get_handler(req):
                 'succes': 'false'
             }
         )
-    candidates = helper_sparql.get_lblod_candidates(list_url)
-    return response.text('Work in progress...')
+    candidates = helper_sparql.get_lblod_candidates(list_uri)
+    return response.json(
+        {
+            'success': 'true',
+            'result': candidates
+        }
+    )
 
 
 # @app.route('/candidates', methods=['GET'])
