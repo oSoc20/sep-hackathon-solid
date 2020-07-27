@@ -58,13 +58,15 @@ def get_lblod_candidates(list_url):
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+        PREFIX adms: <http://www.w3.org/ns/adms#>
         PREFIX ns1: <http://data.vlaanderen.be/ns/mandaat#>
         PREFIX ns2: <http://data.vlaanderen.be/ns/persoon#>
-        SELECT DISTINCT ?personURI ?name ?familyName
+        SELECT DISTINCT ?personURI ?name ?familyName ?identifier
         WHERE {
             <%s> ns1:heeftKandidaat ?personURI.
             ?personURI ns2:gebruikteVoornaam ?name;
-            foaf:familyName ?familyName.
+            foaf:familyName ?familyName;
+            adms:identifier ?identifier.
         }""" % list_url
 
     return make_query(query)

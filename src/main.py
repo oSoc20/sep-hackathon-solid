@@ -2,7 +2,7 @@ from sanic import Sanic, response
 from sanic_openapi import doc, swagger_blueprint
 from sanic_cors import CORS
 from playhouse.shortcuts import model_to_dict
-from peewee import IntegrityError
+from peewee import IntegrityError, DoesNotExist
 import models
 from rdflib import Graph, RDF
 from rdflib.namespace import FOAF
@@ -121,6 +121,15 @@ async def get_handler(req):
             }
         )
     candidates = helper_sparql.get_lblod_candidates(list_uri)
+    for candidate in candidates:
+        try:
+            web_id_uri = get_web_id(candidate['identifier']['value'])
+            candidate['webID'] = {
+                'type': 'literal',
+                'value': web_id_uri
+            }
+        except DoesNotExist:
+            continue
     return response.json(
         {
             'success': 'true',
@@ -137,8 +146,12 @@ def get_web_ids():
     for web_id in web_ids:
         # Convert Python datetime object to ISO 8601 string
         web_id['date_created'] = web_id['date_created'].isoformat()
-
     return web_ids
+
+
+def get_web_id(lblod_id):
+    web_id = models.WebID.get(models.WebID.lblod_id == lblod_id)
+    return web_id.uri
 
 
 def check_equal_names(name1, name2):
