@@ -97,9 +97,9 @@ def get_lblod_person_info(person_uri):
                 foaf:familyName ?familyName.
                 ?listURI ns1:heeftKandidaat <%s>;
                 core:prefLabel ?listName;
-                ns1:lijstnummer ?trackingNb.                 
+                ns1:lijstnummer ?trackingNb.
             }""" % (person_uri, person_uri)
-    
+
     return make_query(query)
 
 
