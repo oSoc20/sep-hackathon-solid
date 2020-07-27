@@ -7,8 +7,6 @@ import models
 from rdflib import Graph, RDF
 from rdflib.namespace import FOAF
 from os import environ
-import requests
-import json
 
 import helper_sparql
 
@@ -83,7 +81,7 @@ async def get_handler(req):
     cities = helper_sparql.get_lblod_cities()
     return response.json(
         {
-            'success': 'true',
+            'success': True,
             'result': cities
         }
     )
@@ -97,13 +95,14 @@ async def get_handler(req):
         return response.json(
             {
                 'message': 'Wrong query parameters',
-                'succes': 'false'
-            }
+                'succes': False
+            },
+            status=400
         )
     lists = helper_sparql.get_lblod_lists(city_uri)
     return response.json(
         {
-            'success': 'true',
+            'success': True,
             'result': lists
         }
     )
@@ -117,8 +116,9 @@ async def get_handler(req):
         return response.json(
             {
                 'message': 'Wrong query parameters',
-                'succes': 'false'
-            }
+                'succes': False,
+            },
+            status=400
         )
     candidates = helper_sparql.get_lblod_candidates(list_uri)
     for candidate in candidates:
@@ -132,7 +132,7 @@ async def get_handler(req):
             continue
     return response.json(
         {
-            'success': 'true',
+            'success': True,
             'result': candidates
         }
     )
