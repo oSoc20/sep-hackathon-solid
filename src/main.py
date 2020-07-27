@@ -138,6 +138,21 @@ async def get_handler(req):
     )
 
 
+@app.route('/person', methods=['GET'])
+async def get_handler(req):
+    try:
+        lblod_id = req.args['lblodID'][0]
+    except KeyError:
+        return response.json(
+            {
+                'message': 'Wrong query parameters',
+                'succes': False,
+            },
+            status=400
+        )
+    return response.text("Work in progress...")
+
+
 def get_web_ids():
     web_ids = models.WebID.select()
 
