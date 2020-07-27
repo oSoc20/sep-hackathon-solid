@@ -83,6 +83,26 @@ def get_lblod_candidates(list_url):
     return make_query(query)
 
 
+def get_lblod_person_info(lblod_uri):
+    query = """
+            PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+            PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+            PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+            PREFIX core: <http://www.w3.org/2004/02/skos/core#>
+            PREFIX ns1: <http://data.vlaanderen.be/ns/mandaat#>
+            PREFIX ns2: <http://data.vlaanderen.be/ns/persoon#>
+            SELECT DISTINCT ?name ?familyName ?listURI ?listName ?trackingNb
+            WHERE {
+                <%s> ns2:gebruikteVoornaam ?name;
+                foaf:familyName ?familyName.
+                ?listURI ns1:heeftKandidaat <%s>;
+                core:prefLabel ?listName;
+                ns1:lijstnummer ?trackingNb.                 
+            }""" % (lblod_uri, lblod_uri)
+    print(query)
+    return make_query(query)
+
+
 def make_query(query):
     sparql_url = environ.get('SPARQL_URL')
 

@@ -141,7 +141,7 @@ async def get_handler(req):
 @app.route('/person', methods=['GET'])
 async def get_handler(req):
     try:
-        lblod_id = req.args['lblodID'][0]
+        lblod_uri = req.args['lblodURI'][0]
     except KeyError:
         return response.json(
             {
@@ -150,7 +150,13 @@ async def get_handler(req):
             },
             status=400
         )
-    return response.text("Work in progress...")
+    info = helper_sparql.get_lblod_person_info(lblod_uri)
+    return response.json(
+        {
+            'success': True,
+            'result': info
+        }
+    )
 
 
 def get_web_ids():
