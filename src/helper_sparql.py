@@ -3,30 +3,16 @@ from os import environ
 
 
 def lblod_id_exists(lblod_id):
-    sparql_url = environ.get('SPARQL_URL')
-
     query = """
     PREFIX ams: <http://www.w3.org/ns/adms#>
     SELECT DISTINCT ?id
     WHERE {
         ?id ams:identifier <%s>.
-    }""" % (lblod_id)
-    res = requests.get(
-            sparql_url,
-            params={
-                "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
-                "format": "json",
-                "query": query
-            }
-        )
-
-    results = res.json()['results']['bindings']
-    return bool(results)
+    }""" % lblod_id
+    return bool(make_query(query))
 
 
 def get_lblod_cities():
-    sparql_url = environ.get('SPARQL_URL')
-
     query = """
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -42,21 +28,11 @@ def get_lblod_cities():
         ?bestuursEenheid ns2:werkingsgebied ?cityURI.
         ?cityURI rdfs:label ?cityName.
     }"""
-    res = requests.get(
-        sparql_url,
-        params={
-            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
-            "format": "json",
-            "query": query
-        }
-    )
-    results = res.json()['results']['bindings']
-    return results
+
+    return make_query(query)
 
 
 def get_lblod_lists(city_url):
-    sparql_url = environ.get('SPARQL_URL')
-
     query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -73,21 +49,11 @@ def get_lblod_lists(city_url):
             ?bestuursOrgaan2 ns2:bestuurt ?bestuursEenheid.
             ?bestuursEenheid ns2:werkingsgebied <%s>.
         }""" % city_url
-    res = requests.get(
-        sparql_url,
-        params={
-            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
-            "format": "json",
-            "query": query
-        }
-    )
-    results = res.json()['results']['bindings']
-    return results
+
+    return make_query(query)
 
 
 def get_lblod_candidates(list_url):
-    sparql_url = environ.get('SPARQL_URL')
-
     query = """
         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
         PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -100,6 +66,13 @@ def get_lblod_candidates(list_url):
             ?personURI ns2:gebruikteVoornaam ?name;
             foaf:familyName ?familyName.
         }""" % list_url
+
+    return make_query(query)
+
+
+def make_query(query):
+    sparql_url = environ.get('SPARQL_URL')
+
     res = requests.get(
         sparql_url,
         params={
