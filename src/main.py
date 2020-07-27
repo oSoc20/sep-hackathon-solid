@@ -7,8 +7,6 @@ import models
 from rdflib import Graph, RDF
 from rdflib.namespace import FOAF
 from os import environ
-import requests
-import json
 
 import helper_sparql
 
