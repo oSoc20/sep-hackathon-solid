@@ -96,7 +96,8 @@ async def get_handler(req):
             {
                 'message': 'Wrong query parameters',
                 'succes': 'false'
-            }
+            },
+            status=400
         )
     lists = helper_sparql.get_lblod_lists(city_uri)
     return response.json(
@@ -116,7 +117,8 @@ async def get_handler(req):
             {
                 'message': 'Wrong query parameters',
                 'succes': 'false'
-            }
+            },
+            status=400
         )
     candidates = helper_sparql.get_lblod_candidates(list_uri)
     return response.json(
