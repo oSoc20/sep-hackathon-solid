@@ -78,92 +78,133 @@ async def r_get(req, name):
     return response.json(valid_web_ids)
 
 
-@app.route('/candidates', methods=['GET'])
+@app.route('/cities', methods=['GET'])
 async def get_handler(req):
-    sparql_url = environ.get('SPARQL_URL')
-
-    query = """
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-    PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-    PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
-    PREFIX mandaat:<http://data.vlaanderen.be/ns/mandaat#>
-        SELECT DISTINCT ?firstName ?familyName ?listName
-        WHERE {
-            ?list rdf:type mandaat:Kandidatenlijst;
-            skos:prefLabel ?listName;
-            mandaat:heeftKandidaat ?person.
-            ?person persoon:gebruikteVoornaam ?firstName ;
-            foaf:familyName ?familyName .
-    }"""
-    query_response = requests.get(
-        sparql_url,
-        params={
-            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
-            "format": "json",
-            "query": query
+    cities = helper_sparql.get_lblod_cities()
+    return response.json(
+        {
+            'success': 'true',
+            'result': cities
         }
     )
-    json_response = json.loads(
-        query_response.content.decode('utf-8')
-    )
-    return response.json(json_response['results']['bindings'])
 
 
-@app.route('/list', methods=['GET'])
+@app.route('/parties', methods=['GET'])
 async def get_handler(req):
     try:
-        name = req.args['name'][0]
-        lastname = req.args['lastname'][0]
+        city_url = req.args['city-url'][0]
     except KeyError:
         return response.json(
             {
-                'message': 'Wrong query parameters!',
+                'message': 'Wrong query parameters',
                 'succes': 'false'
-             },
-            status=400
+            }
         )
+    lists = helper_sparql.get_lblod_lists(city_url)
+    return response.text("Work in progress...")
 
-    sparql_url = environ.get('SPARQL_URL')
 
-    query = """
-        PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-        PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-        PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
-        PREFIX mandaat:<http://data.vlaanderen.be/ns/mandaat#>
-            SELECT DISTINCT ?listName ?listNumber
-            WHERE {
-                ?person persoon:gebruikteVoornaam "%s";
-                foaf:familyName "%s".
-                ?list rdf:type mandaat:Kandidatenlijst;
-                mandaat:heeftKandidaat ?person;
-                skos:prefLabel ?listName;
-                mandaat:lijstnummer ?listNumber.
-        }""" % (name, lastname)
-    query_response = requests.get(
-        sparql_url,
-        params={
-            "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
-            "format": "json",
-            "query": query
-        }
-    )
-    result_json = query_response.json()['results']['bindings']
-    if len(result_json) == 0:
+@app.route('/candidates', methods=['GET'])
+async def get_handler(req):
+    try:
+        list_url = req.args['list-url'][0]
+    except KeyError:
         return response.json(
             {
-                'succes': 'false',
-                'message': 'No person with given name and last name found.'
-            },
-            status=404
+                'message': 'Wrong query parameters',
+                'succes': 'false'
+            }
         )
-    return response.json(
-        {
-            'succes': 'true',
-            'result': result_json
-        }
-    )
+    candidates = helper_sparql.get_lblod_candidates(list_url)
+    return response.text('Work in progress...')
+
+
+# @app.route('/candidates', methods=['GET'])
+# async def get_handler(req):
+#     sparql_url = environ.get('SPARQL_URL')
+#
+#     query = """
+#     PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+#     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+#     PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+#     PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
+#     PREFIX mandaat:<http://data.vlaanderen.be/ns/mandaat#>
+#         SELECT DISTINCT ?firstName ?familyName ?listName
+#         WHERE {
+#             ?list rdf:type mandaat:Kandidatenlijst;
+#             skos:prefLabel ?listName;
+#             mandaat:heeftKandidaat ?person.
+#             ?person persoon:gebruikteVoornaam ?firstName ;
+#             foaf:familyName ?familyName .
+#     }"""
+#     query_response = requests.get(
+#         sparql_url,
+#         params={
+#             "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
+#             "format": "json",
+#             "query": query
+#         }
+#     )
+#     json_response = json.loads(
+#         query_response.content.decode('utf-8')
+#     )
+#     return response.json(json_response['results']['bindings'])
+
+
+# @app.route('/list', methods=['GET'])
+# async def get_handler(req):
+#     try:
+#         name = req.args['name'][0]
+#         lastname = req.args['lastname'][0]
+#     except KeyError:
+#         return response.json(
+#             {
+#                 'message': 'Wrong query parameters!',
+#                 'succes': 'false'
+#              },
+#             status=400
+#         )
+#
+#     sparql_url = environ.get('SPARQL_URL')
+#
+#     query = """
+#         PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+#         PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+#         PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+#         PREFIX persoon: <http://data.vlaanderen.be/ns/persoon#>
+#         PREFIX mandaat:<http://data.vlaanderen.be/ns/mandaat#>
+#             SELECT DISTINCT ?listName ?listNumber
+#             WHERE {
+#                 ?person persoon:gebruikteVoornaam "%s";
+#                 foaf:familyName "%s".
+#                 ?list rdf:type mandaat:Kandidatenlijst;
+#                 mandaat:heeftKandidaat ?person;
+#                 skos:prefLabel ?listName;
+#                 mandaat:lijstnummer ?listNumber.
+#         }""" % (name, lastname)
+#     query_response = requests.get(
+#         sparql_url,
+#         params={
+#             "default-graph-uri": "http://api.sep.osoc.be/mandatendatabank",
+#             "format": "json",
+#             "query": query
+#         }
+#     )
+#     result_json = query_response.json()['results']['bindings']
+#     if len(result_json) == 0:
+#         return response.json(
+#             {
+#                 'succes': 'false',
+#                 'message': 'No person with given name and last name found.'
+#             },
+#             status=404
+#         )
+#     return response.json(
+#         {
+#             'succes': 'true',
+#             'result': result_json
+#         }
+#     )
 
 
 def get_web_ids():
