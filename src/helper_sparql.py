@@ -83,7 +83,7 @@ def get_lblod_candidates(list_url):
     return make_query(query)
 
 
-def get_lblod_person_info(lblod_uri):
+def get_lblod_person_info(person_uri):
     query = """
             PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
             PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -98,8 +98,8 @@ def get_lblod_person_info(lblod_uri):
                 ?listURI ns1:heeftKandidaat <%s>;
                 core:prefLabel ?listName;
                 ns1:lijstnummer ?trackingNb.                 
-            }""" % (lblod_uri, lblod_uri)
-    print(query)
+            }""" % (person_uri, person_uri)
+    
     return make_query(query)
 
 
