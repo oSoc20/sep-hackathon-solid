@@ -2,11 +2,13 @@ from sanic import Sanic, response
 from sanic_openapi import doc, swagger_blueprint
 from sanic_cors import CORS
 from playhouse.shortcuts import model_to_dict
-from peewee import IntegrityError, DoesNotExist
+from peewee import IntegrityError, OperationalError, DoesNotExist
 import models
 from rdflib import Graph, RDF
 from rdflib.namespace import FOAF
 from os import environ
+import sys
+from time import sleep
 
 import helper_sparql
 
@@ -194,6 +196,14 @@ def check_equal_names(name1, name2):
 
 if __name__ == '__main__':
     # Connect to database & create tables if necessary
-    models.db.create_tables([models.WebID])
+    for i in range(1, 101):
+        try:
+            models.db.create_tables([models.WebID])
+            break
+        except OperationalError:
+            sys.stderr.write(f'Could not connect to postgres database, retrying... (attempt {i}/30)\n')
+            sys.stderr.flush()
+            sleep(0.5)
+
     models.db.close()
     app.run(host='0.0.0.0', port=8000, debug=environ.get('DEBUG'))
