@@ -67,7 +67,12 @@ def get_lblod_lists(city_url):
             ?election ns1:steltSamen ?bestuursOrgaan.
             ?bestuursOrgaan ns1:isTijdspecialisatieVan ?bestuursOrgaan2.
             ?bestuursOrgaan2 ns2:bestuurt ?bestuursEenheid.
-            ?bestuursEenheid ns2:werkingsgebied <%s>.
+            ?bestuursEenheid ns2:werkingsgebied <%s>;
+            ns2:classificatie ?classificationCode.
+            ?classificationCode core:prefLabel ?locationLabel.
+            FILTER NOT EXISTS {
+                ?classificationCode core:prefLabel "OCMW"
+            }
         }""" % city_url
 
     return make_query(query)
