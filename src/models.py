@@ -1,19 +1,15 @@
 from peewee import Model, PostgresqlDatabase, CharField, DateTimeField
-from playhouse.shortcuts import ReconnectMixin
 import datetime
 
 from os import environ
 
-
-class ReconnectPostgresqlDatabase(ReconnectMixin, PostgresqlDatabase):
-    pass
-
-
-db = ReconnectPostgresqlDatabase(host=environ.get('PG_HOST'),
-                                 database=environ.get('PG_DBNAME'),
-                                 user=environ.get('PG_USER'),
-                                 password=environ.get('PG_PASS'),
-                                 autorollback=True)
+# TODO: peewee's docs mention a middleware thing for sanic, but it seems to want to reconnect to the database for every request? Maybe check it out
+# http://docs.peewee-orm.com/en/latest/peewee/database.html#sanic
+db = PostgresqlDatabase(host=environ.get('PG_HOST'),
+                        database=environ.get('PG_DBNAME'),
+                        user=environ.get('PG_USER'),
+                        password=environ.get('PG_PASS'),
+                        autorollback=True)
 
 # NOTE: peewee unfortunately does not support automatic schema migrations, so we have to handle this manually if we change a model.
 # Fortunately the data we're storing is pretty simple, so this shouldn't happen a lot.
