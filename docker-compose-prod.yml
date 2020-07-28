@@ -1,13 +1,9 @@
-version: '3'
+version: "3.8"
 
 services:
 
   api:
-    build: .
     image: solidelections/api
-    restart: always
-    ports:
-      - 80:8000
     environment:
       - DEBUG=${DEBUG}
       - PG_HOST=${PG_HOST}
@@ -15,13 +11,49 @@ services:
       - PG_USER=${PG_USER}
       - PG_PASS=${PG_PASS}
       - SPARQL_URL=${SPARQL_URL}
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        - "traefik.http.services.solid-elections-api.loadbalancer.server.port=8000"
+        - "traefik.http.routers.solid-elections-api.middlewares=redirect-to-https"
+        - "traefik.http.routers.solid-elections-api.rule=Host(`${HOST}`)"
+        - "traefik.http.routers.solid-elections-api.entrypoints=web"
+        - "traefik.http.routers.solid-elections-api-secure.rule=Host(`${HOST}`)"
+        - "traefik.http.routers.solid-elections-api-secure.tls=true"
+        - "traefik.http.routers.solid-elections-api-secure.tls.certresolver=resolver"
 
   db:
     image: postgres:alpine
-    restart: always
-    expose:
-      - 5432
     environment:
       - POSTGRES_PASSWORD=${PG_PASS}
     volumes:
       - ./pgdata:/var/lib/postgresql/data
+
+  virtuoso:
+    image: tenforce/virtuoso
+    environment:
+      - DBA_PASSWORD=${PG_PASS}
+    volumes:
+      - ./virtuoso-data:/data
+    ports:
+      - 8890:8890
+
+  traefik:
+    image: traefik:2.2
+    command:
+      - "--providers.docker=true"
+      - "--providers.docker.swarmmode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web-secure.address=:443"
+      - "--certificatesresolvers.resolver.acme.tlschallenge=true"
+      - "--certificatesresolvers.resolver.acme.email=${LETSENCRYPT_EMAIL}"
+      - "--certificatesresolvers.resolver.acme.storage=/letsencrypt/acme.json"
+      - "--log.level=DEBUG"
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock:ro
