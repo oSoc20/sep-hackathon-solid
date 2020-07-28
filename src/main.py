@@ -24,19 +24,19 @@ async def r_store(req):\
     uri = req.json.get('uri')
     lblod_id = req.json.get('lblod_id')
     if not uri or not lblod_id:
-        return response.json({'success': False, 'message': 'Please set the "uri" and "lblod_id" fields in your JSON body'}, status=400)
+        return response.json({'success': False, 'updated': False, 'message': 'Please set the "uri" and "lblod_id" fields in your JSON body'}, status=400)
 
     if not helper_sparql.lblod_id_exists(lblod_id):
-        return response.json({'success': False, 'message': 'This lblod ID does not exist in our dataset'}, status=400)
+        return response.json({'success': False, 'updated': False, 'message': 'This lblod ID does not exist in our dataset'}, status=400)
 
     # Try to add the data to the database, throw HTTP/400 if user tries to add an existing value
     web_id = models.WebID(uri=uri, lblod_id=lblod_id)
     try:
         web_id.save()
     except IntegrityError:
-        return response.json({'success': False, 'message': 'WebID or lblod ID already exists in database'}, status=400)
+        return response.json({'success': True, 'updated': False, 'message': 'WebID or lblod ID already exists in database'}, status=400)
 
-    return response.json({'success': True, 'message': 'WebID succesfully added to the database!'})
+    return response.json({'success': True, 'updated': True, 'message': 'WebID succesfully added to the database!'})
 
 
 @app.route('/get')
