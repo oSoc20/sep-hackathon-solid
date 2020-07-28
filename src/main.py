@@ -19,6 +19,18 @@ app.config["API_DESCRIPTION"] = "API documentation of the Solid Elections API"
 CORS(app)
 
 
+# Middleware to automatically open/close a database connection for every request
+@app.middleware('request')
+async def handle_request(request):
+    models.db.connect()
+
+@app.middleware('response')
+async def handle_response(request, response):
+    if not models.db.is_closed():
+        models.db.close()
+
+
+
 @app.route('/store/', methods=['POST'])
 @doc.summary("store a new web id")
 async def r_store(req):\
@@ -186,4 +198,5 @@ def check_equal_names(name1, name2):
 if __name__ == '__main__':
     # Connect to database & create tables if necessary
     models.db.create_tables([models.WebID])
+    models.db.close()
     app.run(host='0.0.0.0', port=8000, debug=environ.get('DEBUG'))
