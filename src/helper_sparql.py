@@ -44,6 +44,9 @@ def get_lblod_cities():
         ns2:classificatie ?classificationCode.
         ?classificationCode core:prefLabel ?locationLabel.
         ?cityURI rdfs:label ?cityName.
+        FILTER NOT EXISTS {
+            ?classificationCode core:prefLabel "OCMW"
+        }
     }"""
 
     return make_query(query)
