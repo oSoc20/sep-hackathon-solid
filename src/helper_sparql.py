@@ -29,16 +29,20 @@ def get_lblod_cities():
     query = """
     PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
     PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+    PREFIX org: <http://www.w3.org/ns/org#>
+    PREFIX core: <http://www.w3.org/2004/02/skos/core#>
     PREFIX ns1: <http://data.vlaanderen.be/ns/mandaat#>
     PREFIX ns2: <http://data.vlaanderen.be/ns/besluit#>
-    SELECT DISTINCT ?cityURI ?cityName
+    SELECT DISTINCT ?cityURI ?cityName ?locationLabel
     WHERE {
         ?list rdf:type ns1:Kandidatenlijst;
         ns1:behoortTot ?election.
         ?election ns1:steltSamen ?bestuursOrgaan.
         ?bestuursOrgaan ns1:isTijdspecialisatieVan ?bestuursOrgaan2.
         ?bestuursOrgaan2 ns2:bestuurt ?bestuursEenheid.
-        ?bestuursEenheid ns2:werkingsgebied ?cityURI.
+        ?bestuursEenheid ns2:werkingsgebied ?cityURI;
+        ns2:classificatie ?classificationCode.
+        ?classificationCode core:prefLabel ?locationLabel.
         ?cityURI rdfs:label ?cityName.
     }"""
 
